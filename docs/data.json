@@ -1,0 +1,196 @@
+{
+ "threshold": 100000,
+ "notice": {
+  "id": 2085,
+  "subject": "2026년 9월 유료화 전환 작품 안내",
+  "url": "https://comic.naver.com/notice/detail?noticeId=2085",
+  "registerDate": 1787640899000
+ },
+ "rows": [
+  {
+   "name": "가족같은 XX",
+   "titleId": "790239",
+   "favorite": 294246,
+   "star": 9.96,
+   "starAvg": 9.87,
+   "note": ""
+  },
+  {
+   "name": "개짓",
+   "titleId": "833620",
+   "favorite": 225165,
+   "star": null,
+   "starAvg": null,
+   "note": ""
+  },
+  {
+   "name": "남제",
+   "titleId": "834566",
+   "favorite": 44452,
+   "star": 9.63,
+   "starAvg": 9.82,
+   "note": ""
+  },
+  {
+   "name": "눈 감은 하늘의 기사",
+   "titleId": "838947",
+   "favorite": 29114,
+   "star": 9.92,
+   "starAvg": 9.9,
+   "note": ""
+  },
+  {
+   "name": "돈구멍",
+   "titleId": "828950",
+   "favorite": 101967,
+   "star": 9.87,
+   "starAvg": 9.87,
+   "note": ""
+  },
+  {
+   "name": "로맨스 저주",
+   "titleId": "834035",
+   "favorite": 93814,
+   "star": null,
+   "starAvg": null,
+   "note": ""
+  },
+  {
+   "name": "마침표의 유예기간",
+   "titleId": "822309",
+   "favorite": 62023,
+   "star": 9.99,
+   "starAvg": 9.96,
+   "note": ""
+  },
+  {
+   "name": "무진",
+   "titleId": "805691",
+   "favorite": 80529,
+   "star": 9.52,
+   "starAvg": 9.23,
+   "note": ""
+  },
+  {
+   "name": "비서실세",
+   "titleId": "835553",
+   "favorite": 53283,
+   "star": 9.9,
+   "starAvg": 9.89,
+   "note": ""
+  },
+  {
+   "name": "사내 계약 연애",
+   "titleId": "842148",
+   "favorite": 70277,
+   "star": 9.87,
+   "starAvg": 9.9,
+   "note": ""
+  },
+  {
+   "name": "시체 조작돌",
+   "titleId": "840598",
+   "favorite": 30797,
+   "star": 9.99,
+   "starAvg": 9.94,
+   "note": ""
+  },
+  {
+   "name": "신의 재래",
+   "titleId": "807206",
+   "favorite": 97037,
+   "star": 9.89,
+   "starAvg": 9.91,
+   "note": ""
+  },
+  {
+   "name": "신입사원 김철수",
+   "titleId": "812594",
+   "favorite": 172942,
+   "star": 9.85,
+   "starAvg": 9.85,
+   "note": ""
+  },
+  {
+   "name": "악신소년",
+   "titleId": "840347",
+   "favorite": 41309,
+   "star": 9.87,
+   "starAvg": 9.75,
+   "note": ""
+  },
+  {
+   "name": "열사병",
+   "titleId": "849482",
+   "favorite": 33422,
+   "star": 9.96,
+   "starAvg": 9.96,
+   "note": ""
+  },
+  {
+   "name": "요리사가 되고 싶은 천마님",
+   "titleId": "823536",
+   "favorite": 34425,
+   "star": 9.65,
+   "starAvg": 9.74,
+   "note": ""
+  },
+  {
+   "name": "이계진입 리로디드",
+   "titleId": "793553",
+   "favorite": 99618,
+   "star": 9.88,
+   "starAvg": 9.67,
+   "note": ""
+  },
+  {
+   "name": "좀비떼로",
+   "titleId": "840597",
+   "favorite": 37007,
+   "star": 9.92,
+   "starAvg": 9.64,
+   "note": ""
+  },
+  {
+   "name": "킬더킹",
+   "titleId": "670145",
+   "favorite": 74056,
+   "star": 9.55,
+   "starAvg": 9.56,
+   "note": ""
+  },
+  {
+   "name": "플레이어",
+   "titleId": "745876",
+   "favorite": 265255,
+   "star": 9.95,
+   "starAvg": 9.86,
+   "note": ""
+  },
+  {
+   "name": "흑역사가 역주행한다",
+   "titleId": "836568",
+   "favorite": 60796,
+   "star": 8.54,
+   "starAvg": 9.38,
+   "note": ""
+  },
+  {
+   "name": "회귀자는 나만 지킨다",
+   "titleId": 833906,
+   "favorite": 16291,
+   "star": 8.95,
+   "starAvg": 9.55,
+   "note": "공지 링크가 다른 작품(ZD)을 가리켜 검색으로 보정"
+  },
+  {
+   "name": "ZD",
+   "titleId": "835698",
+   "favorite": 23556,
+   "star": 8.7,
+   "starAvg": 9.86,
+   "note": ""
+  }
+ ],
+ "fetchedAt": "2026-09-07T10:55:25+09:00"
+}

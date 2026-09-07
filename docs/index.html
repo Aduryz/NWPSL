@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>네이버 웹툰 유료화 전환 작품 — 관심수 · 별점</title>
+<style>
+  :root{
+    --bg:#fafafa; --card:#fff; --line:#e6e6e6; --text:#222; --dim:#777;
+    --pink:#e83e8c; --pinkbg:#fff0f6; --accent:#03c75a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:24px 16px 60px;background:var(--bg);color:var(--text);
+       font:15px/1.6 "Malgun Gothic","맑은 고딕",-apple-system,system-ui,sans-serif}
+  .wrap{max-width:900px;margin:0 auto}
+  h1{font-size:22px;margin:0 0 6px}
+  .sub{color:var(--dim);font-size:13px;margin-bottom:20px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:12px;
+         padding:18px;margin-bottom:16px}
+  button{font:inherit;font-weight:700;color:#fff;background:var(--accent);
+         border:0;border-radius:8px;padding:12px 22px;cursor:pointer}
+  button:hover{filter:brightness(.93)}
+  button:disabled{background:#bbb;cursor:default}
+  .opt{margin-left:14px;color:var(--dim);font-size:13px}
+  .status{margin-top:12px;font-size:13px;color:var(--dim);min-height:20px}
+  .bar{height:6px;background:#eee;border-radius:3px;overflow:hidden;margin-top:10px;display:none}
+  .bar > i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
+  .notice{font-size:14px;margin-bottom:14px}
+  .notice a{color:#0b64d1}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left}
+  th{font-size:12px;color:var(--dim);font-weight:600;white-space:nowrap;
+     cursor:pointer;user-select:none;background:#fbfbfb}
+  th.num,td.num{text-align:right;font-variant-numeric:tabular-nums}
+  td.idx{color:var(--dim);width:34px;text-align:right}
+  tr.hot td{color:var(--pink);font-weight:700;background:var(--pinkbg)}
+  tr.hot a{color:var(--pink)}
+  td a{color:inherit;text-decoration:none}
+  td a:hover{text-decoration:underline}
+  .note{color:var(--dim);font-size:12px;font-weight:400}
+  .sum{margin-top:14px;font-size:14px}
+  .sum b{color:var(--pink)}
+  .foot{color:var(--dim);font-size:12px;margin-top:8px}
+  .err{color:#c0392b}
+  @media (max-width:640px){ .hide-s{display:none} body{padding:16px 10px 40px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>네이버 웹툰 유료화 전환 작품</h1>
+  <div class="sub">
+    공지 게시판에서 <b>“유료화”</b>로 검색한 가장 최신 공지를 열어, 거기 적힌 작품들의
+    <b>관심수</b>와 <b>별점</b>을 보여줍니다. 관심수
+    <b style="color:var(--pink)">100,000 이상</b>은 핑크색입니다.
+  </div>
+
+  <div class="panel">
+    <button id="run">지금 불러오기</button>
+    <label class="opt"><input type="checkbox" id="live" checked> 실시간으로 새로 조회</label>
+    <div class="bar" id="bar"><i></i></div>
+    <div class="status" id="status">버튼을 누르면 시작합니다.</div>
+  </div>
+
+  <div class="panel" id="result" hidden>
+    <div class="notice" id="notice"></div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr>
+          <th style="width:34px"></th>
+          <th data-sort="name">작품명</th>
+          <th class="num" data-sort="favorite">관심수</th>
+          <th class="num" data-sort="star">별점</th>
+          <th class="num hide-s" data-sort="starAvg">최근 20화 평균</th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div class="sum" id="sum"></div>
+    <div class="foot" id="foot"></div>
+  </div>
+
+</div>
+
+<script>
+const API = "https://comic.naver.com/api";
+const THRESHOLD = 100000;
+const WORKERS = 4;
+
+const $ = (id) => document.getElementById(id);
+const say = (msg, err) => { $("status").innerHTML = msg; $("status").className = "status" + (err ? " err" : ""); };
+const setBar = (done, total) => {
+  const b = $("bar");
+  b.style.display = total ? "block" : "none";
+  b.firstElementChild.style.width = total ? (100 * done / total) + "%" : "0";
+};
+
+/* 네이버 API 는 CORS 를 열어주지 않으므로 공개 프록시를 거쳐 읽는다.
+   먼저 성공한 프록시를 기억해 두고 계속 쓴다. */
+const PROXIES = [
+  { name: "allorigins",
+    url: (u) => "https://api.allorigins.win/raw?url=" + encodeURIComponent(u) },
+  { name: "codetabs",
+    url: (u) => "https://api.codetabs.com/v1/proxy/?quest=" + encodeURIComponent(u) },
+  { name: "cors.lol",
+    url: (u) => "https://api.cors.lol/?url=" + encodeURIComponent(u) },
+  { name: "allorigins(get)",
+    url: (u) => "https://api.allorigins.win/get?url=" + encodeURIComponent(u),
+    pick: (t) => JSON.parse(t).contents },
+  { name: "jina",                       // 마크다운으로 감싸서 주므로 본문만 뽑아 쓴다
+    url: (u) => "https://r.jina.ai/" + u },
+];
+let goodProxy = null;
+
+function toJSON(text) {
+  try { return JSON.parse(text); } catch (e) { /* 감싸져 있으면 아래에서 뽑는다 */ }
+  const a = text.indexOf("{"), b = text.lastIndexOf("}");
+  if (a >= 0 && b > a) return JSON.parse(text.slice(a, b + 1));
+  throw new Error("JSON 아님");
+}
+
+async function getJSON(url) {
+  const order = goodProxy ? [goodProxy, ...PROXIES.filter(p => p !== goodProxy)] : PROXIES;
+  let last;
+  for (const p of order) {
+    try {
+      const r = await fetch(p.url(url));
+      if (!r.ok) throw new Error(p.name + " HTTP " + r.status);
+      const raw = await r.text();
+      const j = toJSON(p.pick ? p.pick(raw) : raw);
+      goodProxy = p;
+      return j;
+    } catch (e) { last = e; }
+  }
+  throw last || new Error("공개 프록시가 모두 응답하지 않음");
+}
+
+/* ── 공지 파싱 (파이썬 쪽과 같은 규칙) ───────────────────── */
+const clean = (s) => (s || "").replace(/[\uFEFF\u200B-\u200D]/g, "").replace(/\s+/g, " ").trim();
+const key = (s) => clean(s).replace(/\s+/g, "").toLowerCase();
+
+function parseTitles(contentHtml) {
+  const marked = contentHtml
+    .replace(/<a\b[^>]*href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi, (m, href, inner) => {
+      const tid = /titleId=(\d+)/.exec(href);
+      const name = clean(inner.replace(/<[^>]+>/g, ""));
+      return name + "\u0001" + (tid ? tid[1] : "") + "\u0002";
+    })
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/(p|div|li|tr)>/gi, "\n");
+
+  const box = document.createElement("div");
+  box.innerHTML = marked.replace(/<[^>]+>/g, "");
+  const text = box.textContent;
+
+  const items = [], seen = new Set();
+  for (const raw of text.split("\n")) {
+    const m = /^\s*\d+\s*[.)]\s*(.+)$/.exec(raw.trim());
+    if (!m) continue;
+    const body = m[1].trim();
+    const hit = /([^\u0001]*)\u0001(\d*)\u0002/.exec(body);
+    let name = hit ? clean(hit[1]) : clean(body.replace(/[\u0001\u0002]/g, ""));
+    const tid = hit && hit[2] ? hit[2] : null;
+    name = name.replace(/\s*\(\s*(완결|휴재|재연재)\s*\)\s*$/, "").trim();
+    if (name && !seen.has(key(name))) { seen.add(key(name)); items.push({ name, tid }); }
+  }
+  return items;
+}
+
+/* ── 작품 하나 조회 ──────────────────────────────────────── */
+async function searchWebtoon(name) {
+  const d = await getJSON(API + "/search/all?keyword=" + encodeURIComponent(name));
+  const list = (d.searchWebtoonResult && d.searchWebtoonResult.searchViewList) || [];
+  if (!list.length) return {};
+  const exact = list.find(v => key(v.titleName) === key(name));
+  const v = exact || list[0];
+  return { tid: v.titleId, name: v.titleName };
+}
+
+async function fetchStars(tid) {
+  try {
+    const d = await getJSON(API + "/article/list?titleId=" + tid + "&page=1&sort=DESC");
+    const s = (d.articleList || []).map(a => a.starScore).filter(x => typeof x === "number");
+    if (!s.length) return {};
+    return { star: +s[0].toFixed(2), starAvg: +(s.reduce((a, b) => a + b, 0) / s.length).toFixed(2) };
+  } catch (e) { return {}; }
+}
+
+async function fetchOne(item) {
+  const row = { name: item.name, titleId: null, favorite: null, star: null, starAvg: null, note: "" };
+  try {
+    let tid = item.tid, info = null;
+    if (tid) {
+      info = await getJSON(API + "/article/list/info?titleId=" + tid);
+      if (key(info.titleName) !== key(item.name)) {   // 공지에 잘못 걸린 링크 보정
+        const f = await searchWebtoon(item.name);
+        if (f.tid && key(f.name) === key(item.name)) {
+          row.note = "공지 링크가 다른 작품(" + info.titleName + ")을 가리켜 검색으로 보정";
+          tid = f.tid; info = null;
+        }
+      }
+    }
+    if (!tid) { const f = await searchWebtoon(item.name); tid = f.tid; }
+    if (!tid) { row.note = "검색 결과 없음"; return row; }
+    if (!info) info = await getJSON(API + "/article/list/info?titleId=" + tid);
+
+    row.titleId = tid;
+    row.name = info.titleName || item.name;
+    row.favorite = (info.favoriteCount != null) ? info.favoriteCount : null;
+    if (row.favorite === null && !row.note) row.note = "관심수 없음(성인/비공개?)";
+    Object.assign(row, await fetchStars(tid));
+  } catch (e) {
+    row.note = "조회 실패(" + e.message + ")";
+  }
+  return row;
+}
+
+/* 동시 실행 개수 제한 */
+async function pool(items, worker, onProgress) {
+  const out = new Array(items.length);
+  let next = 0, done = 0;
+  await Promise.all(Array.from({ length: Math.min(WORKERS, items.length) }, async () => {
+    while (next < items.length) {
+      const i = next++;
+      out[i] = await worker(items[i]);
+      onProgress(++done, items.length);
+    }
+  }));
+  return out;
+}
+
+/* ── 실시간 수집 ─────────────────────────────────────────── */
+async function collectLive() {
+  say("공지 목록을 읽는 중...");
+  const list = await getJSON(API + "/notice/list?searchWord=" + encodeURIComponent("유료화") + "&page=1");
+  const rows = [...(list.bestNoticeList || []), ...(list.generalNoticeList || [])];
+  if (!rows.length) throw new Error("공지 검색 결과가 비었습니다");
+  const n = rows[0];
+
+  say("최신 공지 <b>" + n.subject + "</b> 를 여는 중...");
+  const detail = await getJSON(API + "/notice/detail?noticeId=" + n.noticeId);
+  const items = parseTitles(detail.notice.content);
+  if (!items.length) throw new Error("공지 본문에서 작품명을 찾지 못했습니다");
+
+  say("작품 " + items.length + "편의 관심수 · 별점을 확인하는 중...");
+  const result = await pool(items, fetchOne, (d, t) => {
+    setBar(d, t);
+    say("작품 " + d + " / " + t + " 확인 중...");
+  });
+  setBar(0, 0);
+
+  return {
+    threshold: THRESHOLD,
+    notice: { id: n.noticeId, subject: n.subject, url: "https://comic.naver.com/notice/detail?noticeId=" + n.noticeId },
+    rows: result,
+    fetchedAt: new Date().toISOString(),
+    source: "live",
+  };
+}
+
+/* ── 표 그리기 ───────────────────────────────────────────── */
+let current = null, sortKey = null, sortAsc = false;
+
+function render(data) {
+  current = data;
+  $("result").hidden = false;
+  $("notice").innerHTML =
+    "최신 공지 · <a href=\"" + data.notice.url + "\" target=\"_blank\" rel=\"noopener\"><b>" +
+    data.notice.subject + "</b></a>";
+
+  let rows = data.rows.slice();
+  if (sortKey) {
+    rows.sort((a, b) => {
+      const x = a[sortKey], y = b[sortKey];
+      if (x == null && y == null) return 0;
+      if (x == null) return 1;
+      if (y == null) return -1;
+      const c = (typeof x === "string") ? x.localeCompare(y, "ko") : x - y;
+      return sortAsc ? c : -c;
+    });
+  }
+
+  const num = (v) => v == null ? "–" : v.toLocaleString("ko-KR");
+  const st = (v) => v == null ? "–" : v.toFixed(2);
+  let hot = 0;
+
+  $("tbody").innerHTML = rows.map((r, i) => {
+    const isHot = r.favorite != null && r.favorite >= data.threshold;
+    if (isHot) hot++;
+    const link = r.titleId ? "https://comic.naver.com/webtoon/list?titleId=" + r.titleId : null;
+    const name = link
+      ? "<a href=\"" + link + "\" target=\"_blank\" rel=\"noopener\">" + r.name + "</a>"
+      : r.name;
+    const note = r.note ? " <span class=\"note\">" + r.note + "</span>" : "";
+    return "<tr class=\"" + (isHot ? "hot" : "") + "\">" +
+      "<td class=\"idx\">" + (i + 1) + "</td>" +
+      "<td>" + name + note + "</td>" +
+      "<td class=\"num\">" + num(r.favorite) + "</td>" +
+      "<td class=\"num\">" + st(r.star) + "</td>" +
+      "<td class=\"num hide-s\">" + st(r.starAvg) + "</td>" +
+    "</tr>";
+  }).join("");
+
+  $("sum").innerHTML = "관심수 " + data.threshold.toLocaleString("ko-KR") +
+    " 이상 <b>" + hot + "편</b> / 전체 " + rows.length + "편";
+
+  const when = data.fetchedAt ? new Date(data.fetchedAt).toLocaleString("ko-KR") : "-";
+  $("foot").textContent =
+    (data.source === "live" ? "실시간 조회" : "저장된 자료(GitHub Actions 자동 갱신)") +
+    " · " + when + " 기준 · 별점은 최신 회차 기준입니다(작품 단위 별점은 네이버가 제공하지 않음).";
+}
+
+document.querySelectorAll("th[data-sort]").forEach(th => {
+  th.addEventListener("click", () => {
+    const k = th.dataset.sort;
+    sortAsc = (sortKey === k) ? !sortAsc : false;
+    sortKey = k;
+    if (current) render(current);
+  });
+});
+
+/* ── 버튼 ────────────────────────────────────────────────── */
+async function loadCached() {
+  const r = await fetch("data.json?t=" + Date.now());
+  if (!r.ok) throw new Error("data.json 없음");
+  const d = await r.json();
+  d.source = "cache";
+  return d;
+}
+
+$("run").addEventListener("click", async () => {
+  const btn = $("run");
+  btn.disabled = true;
+  sortKey = null;
+  try {
+    if ($("live").checked) {
+      try {
+        render(await collectLive());
+        say("완료 — 네이버에서 방금 읽어온 값입니다.");
+        return;
+      } catch (e) {
+        say("실시간 조회 실패(" + e.message + "). 저장된 자료로 대신 보여줍니다.", true);
+      }
+    } else {
+      say("저장된 자료를 읽는 중...");
+    }
+    render(await loadCached());
+    if (!$("live").checked) say("완료 — 저장된 자료입니다.");
+  } catch (e) {
+    say("실패: " + e.message, true);
+  } finally {
+    setBar(0, 0);
+    btn.disabled = false;
+  }
+});
+
+/* 페이지를 열면 저장된 자료를 먼저 조용히 보여준다.
+   주소 끝에 #auto 를 붙이면 열자마자 실시간 조회까지 자동으로 한다. */
+loadCached().then(d => { render(d); say("저장된 자료를 보고 있습니다. 버튼을 누르면 새로 조회합니다."); })
+            .catch(() => {})
+            .finally(() => { if (location.hash === "#auto") $("run").click(); });
+</script>
+</body>
+</html>
