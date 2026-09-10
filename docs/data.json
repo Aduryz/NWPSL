@@ -10,7 +10,7 @@
   {
    "name": "가족같은 XX",
    "titleId": "790239",
-   "favorite": 293983,
+   "favorite": 293865,
    "star": 9.96,
    "starAvg": 9.87,
    "note": ""
@@ -18,7 +18,7 @@
   {
    "name": "개짓",
    "titleId": "833620",
-   "favorite": 224971,
+   "favorite": 224878,
    "star": null,
    "starAvg": null,
    "note": ""
@@ -26,7 +26,7 @@
   {
    "name": "남제",
    "titleId": "834566",
-   "favorite": 44407,
+   "favorite": 44360,
    "star": 9.63,
    "starAvg": 9.82,
    "note": ""
@@ -34,7 +34,7 @@
   {
    "name": "눈 감은 하늘의 기사",
    "titleId": "838947",
-   "favorite": 29139,
+   "favorite": 29138,
    "star": 9.92,
    "starAvg": 9.91,
    "note": ""
@@ -42,7 +42,7 @@
   {
    "name": "돈구멍",
    "titleId": "828950",
-   "favorite": 101928,
+   "favorite": 101908,
    "star": 9.87,
    "starAvg": 9.87,
    "note": ""
@@ -50,7 +50,7 @@
   {
    "name": "로맨스 저주",
    "titleId": "834035",
-   "favorite": 93650,
+   "favorite": 93580,
    "star": null,
    "starAvg": null,
    "note": ""
@@ -58,15 +58,15 @@
   {
    "name": "마침표의 유예기간",
    "titleId": "822309",
-   "favorite": 61998,
-   "star": 9.99,
-   "starAvg": 9.97,
+   "favorite": 61984,
+   "star": 9.98,
+   "starAvg": 9.96,
    "note": ""
   },
   {
    "name": "무진",
    "titleId": "805691",
-   "favorite": 80519,
+   "favorite": 80516,
    "star": 9.53,
    "starAvg": 9.24,
    "note": ""
@@ -74,7 +74,7 @@
   {
    "name": "비서실세",
    "titleId": "835553",
-   "favorite": 53247,
+   "favorite": 53224,
    "star": 9.9,
    "starAvg": 9.89,
    "note": ""
@@ -82,7 +82,7 @@
   {
    "name": "사내 계약 연애",
    "titleId": "842148",
-   "favorite": 70182,
+   "favorite": 70112,
    "star": 9.87,
    "starAvg": 9.9,
    "note": ""
@@ -90,7 +90,7 @@
   {
    "name": "시체 조작돌",
    "titleId": "840598",
-   "favorite": 30754,
+   "favorite": 30740,
    "star": 9.99,
    "starAvg": 9.94,
    "note": ""
@@ -98,7 +98,7 @@
   {
    "name": "신의 재래",
    "titleId": "807206",
-   "favorite": 97056,
+   "favorite": 97052,
    "star": 9.87,
    "starAvg": 9.89,
    "note": ""
@@ -106,7 +106,7 @@
   {
    "name": "신입사원 김철수",
    "titleId": "812594",
-   "favorite": 172824,
+   "favorite": 172741,
    "star": 9.85,
    "starAvg": 9.84,
    "note": ""
@@ -114,7 +114,7 @@
   {
    "name": "악신소년",
    "titleId": "840347",
-   "favorite": 41267,
+   "favorite": 41252,
    "star": 9.88,
    "starAvg": 9.75,
    "note": ""
@@ -122,7 +122,7 @@
   {
    "name": "열사병",
    "titleId": "849482",
-   "favorite": 33593,
+   "favorite": 33632,
    "star": 9.96,
    "starAvg": 9.96,
    "note": ""
@@ -130,7 +130,7 @@
   {
    "name": "요리사가 되고 싶은 천마님",
    "titleId": "823536",
-   "favorite": 34401,
+   "favorite": 34390,
    "star": 9.65,
    "starAvg": 9.74,
    "note": ""
@@ -138,7 +138,7 @@
   {
    "name": "이계진입 리로디드",
    "titleId": "793553",
-   "favorite": 99600,
+   "favorite": 99568,
    "star": 9.88,
    "starAvg": 9.66,
    "note": ""
@@ -146,7 +146,7 @@
   {
    "name": "좀비떼로",
    "titleId": "840597",
-   "favorite": 36997,
+   "favorite": 36974,
    "star": 9.92,
    "starAvg": 9.64,
    "note": ""
@@ -154,7 +154,7 @@
   {
    "name": "킬더킹",
    "titleId": "670145",
-   "favorite": 74047,
+   "favorite": 74063,
    "star": 9.55,
    "starAvg": 9.56,
    "note": ""
@@ -162,7 +162,7 @@
   {
    "name": "플레이어",
    "titleId": "745876",
-   "favorite": 265353,
+   "favorite": 265341,
    "star": 9.95,
    "starAvg": 9.86,
    "note": ""
@@ -170,8 +170,8 @@
   {
    "name": "흑역사가 역주행한다",
    "titleId": "836568",
-   "favorite": 60784,
-   "star": 8.54,
+   "favorite": 60764,
+   "star": 8.55,
    "starAvg": 9.38,
    "note": ""
   },
@@ -186,11 +186,11 @@
   {
    "name": "ZD",
    "titleId": "835698",
-   "favorite": 23560,
+   "favorite": 23559,
    "star": 8.7,
    "starAvg": 9.86,
    "note": ""
   }
  ],
- "fetchedAt": "2026-09-09T13:33:39+09:00"
+ "fetchedAt": "2026-09-10T13:33:10+09:00"
 }
